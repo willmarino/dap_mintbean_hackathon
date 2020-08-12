@@ -29,7 +29,7 @@ export default new Phaser.Class({
 
     const stars = this.physics.add.group({
       key: 'star',
-      repeat: 11,
+      repeat: 0,
       setScale: {x: 0.2, y: 0.2 },
       setXY: { x:400, y: 300 }
     });
@@ -63,11 +63,13 @@ export default new Phaser.Class({
     );
 
 
-    box.setBounce(1, 1);
+
+    // box.setBounce(1, 1);
     box.setCollideWorldBounds(true);
   },
   update: function () {
     const { velocity } = box.body;
+    box.has_jumped = false;
 
     if (cursors.space.isDown) {
       const x = decelerate(velocity.x);
@@ -75,9 +77,38 @@ export default new Phaser.Class({
       box.setVelocity(x, y)
     }
 
-    if (cursors.up.isDown) box.setVelocityY(accelerate(velocity.y, -1));
-    if (cursors.right.isDown) box.setVelocityX(accelerate(velocity.x, 1));
-    if (cursors.down.isDown) box.setVelocityY(accelerate(velocity.y, 1));
-    if (cursors.left.isDown) box.setVelocityX(accelerate(velocity.x, -1));
+
+    // if (cursors.up.isDown) box.setVelocityY(accelerate(velocity.y, -1));
+    if (cursors.up.isDown){
+      if(!box.has_jumped){
+        velocity.y = -300;
+        box.has_jumped = true;
+      }
+    };
+
+    if (cursors.right.isDown) {
+      if(box.body.velocity.x < 0){
+        box.body.velocity.x = 0
+      }
+      box.setVelocityX(accelerate(velocity.x, 2));
+      console.log(box.body.velocity.x);
+    };
+
+    if (cursors.down.isDown) box.setVelocityY(accelerate(velocity.y, 2));
+
+    if (cursors.left.isDown){
+      if(box.body.velocity.x > 0){
+        box.body.velocity.x = 0
+      }
+
+      box.setVelocityX(accelerate(velocity.x, -2));
+
+      if(box.body.velocity.x < -300){
+        debugger;
+        box.body.velocity.x = -300;
+      }
+      console.log(box.body.velocity.x);
+    };
+
   }
 });
